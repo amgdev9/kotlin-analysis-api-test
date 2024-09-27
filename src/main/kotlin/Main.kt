@@ -2,6 +2,7 @@ package org.example
 
 import com.intellij.mock.MockProject
 import com.intellij.openapi.vfs.StandardFileSystems
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.analysis.api.KtAnalysisApiInternals
 import org.jetbrains.kotlin.analysis.api.analyze
@@ -12,11 +13,10 @@ import org.jetbrains.kotlin.analysis.api.standalone.buildStandaloneAnalysisAPISe
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtLibraryModule
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtSdkModule
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtSourceModule
-import org.jetbrains.kotlin.load.kotlin.getJvmModuleNameForDeserializedDescriptor
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
-import org.jetbrains.kotlin.platform.konan.NativePlatform
-import org.jetbrains.kotlin.platform.konan.NativePlatforms
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.psiUtil.getFileOrScriptDeclarations
 import kotlin.io.path.Path
 
 @OptIn(KtAnalysisApiInternals::class)
@@ -29,6 +29,7 @@ fun main() {
                 KtAlwaysAccessibleLifetimeTokenProvider::class.java
             )
 
+            // Kotlin standard library
             val stdlibModule = addModule(
                 buildKtLibraryModule {
                     addBinaryRoot(Path("/home/amg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.20/7388d355f7cceb002cd387ccb7ab3850e4e0a07f/kotlin-stdlib-2.0.20.jar"))
@@ -37,6 +38,7 @@ fun main() {
                 }
             )
 
+            // JDK so standard library works for java files
             val jdkModule = addModule(
                 buildKtSdkModule {
                     platform = JvmPlatforms.defaultJvmPlatform
@@ -67,9 +69,28 @@ fun main() {
     val psiManager = PsiManager.getInstance(session.project)
     val vFile = fs.findFileByPath(path.toString())
     val psiFile = vFile?.let(psiManager::findFile)
-    val ktFile = (psiFile as? KtFile)!!
+    val ktFile = (psiFile as? KtFile)!! // PsiJavaFile for java
 
-    // Get errors and warnings
+    diagnostics(ktFile)
+    goToDefinition(ktFile, 3, 29)
+}
+
+fun computeOffset(text: String, line: Int, column: Int): Int {
+    return text.lineSequence().take(line - 1).sumOf { it.length + 1 } + column - 1
+}
+
+fun goToDefinition(ktFile: KtFile, line: Int, column: Int) {
+    val offset = computeOffset(ktFile.text, line, column)
+    analyze(ktFile) {
+        val ref = ktFile.findReferenceAt(offset)!!
+        val file = ref.resolve()!!.containingFile
+        println("GO TO DEFINITION:")
+        println("REF: ${ref}")
+        println("${file.containingDirectory}/${file.containingFile.name}")
+    }
+}
+
+fun diagnostics(ktFile: KtFile) {
     analyze(ktFile) {
         val diagnostics = ktFile.collectDiagnosticsForFile(KtDiagnosticCheckerFilter.EXTENDED_AND_COMMON_CHECKERS)
         println("Diagnostics: ${diagnostics.size}")
