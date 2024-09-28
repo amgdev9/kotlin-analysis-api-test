@@ -1,6 +1,5 @@
 package org.example
 
-import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.KaDiagnosticCheckerFilter
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
@@ -31,7 +30,7 @@ fun main() {
             val jdkModule = addModule(
                 buildKtSdkModule {
                     platform = JvmPlatforms.defaultJvmPlatform
-                    addBinaryRootsFromJdkHome(Path("/usr/lib/jvm/java-11-openjdk-amd64"), false)
+                    addBinaryRootsFromJdkHome(Path("/usr/lib/jvm/java-17-openjdk-amd64"), false)
                     libraryName = "JDK"
                 }
             )
@@ -69,10 +68,12 @@ fun goToDefinition(ktFile: KtFile, line: Int, column: Int) {
     val offset = computeOffset(ktFile.text, line, column)
     analyze(ktFile) {
         val ref = ktFile.findReferenceAt(offset)!!
-        val file = ref.resolve()!!.containingFile
+        val element = ref.resolve()!!
+        val file = element.containingFile
         println("GO TO DEFINITION:")
         println("REF: $ref")
         println("${file.containingDirectory}/${file.containingFile.name}")
+        println(element.textRange)
     }
 }
 

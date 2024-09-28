@@ -1,5 +1,6 @@
 val analysisApiKotlinVersion = "2.1.0-dev-5441"
 val intellijVersion = "233.13135.103"
+val jdkVersion = 17
 
 plugins {
     kotlin("jvm") version "2.0.20"
@@ -23,6 +24,7 @@ dependencies {
     implementation("com.jetbrains.intellij.platform:core:$intellijVersion")
     implementation("com.jetbrains.intellij.platform:core-impl:$intellijVersion")
     implementation("com.jetbrains.intellij.platform:util:$intellijVersion")
+
     implementation("org.jetbrains.kotlin:kotlin-compiler:$analysisApiKotlinVersion")
     implementation("org.jetbrains.kotlin:high-level-api-fir-for-ide:$analysisApiKotlinVersion") {
         isTransitive = false
@@ -62,7 +64,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(jdkVersion)
 }
 
 application {
