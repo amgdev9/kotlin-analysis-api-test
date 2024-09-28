@@ -1,5 +1,5 @@
-val analysisApiKotlinVersion = "2.0.20-dev-3728"
-val intellijVersion = "213.7172.25"
+val analysisApiKotlinVersion = "2.1.0-dev-5441"
+val intellijVersion = "233.13135.103"
 
 plugins {
     kotlin("jvm") version "2.0.20"
@@ -27,16 +27,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:high-level-api-fir-for-ide:$analysisApiKotlinVersion") {
         isTransitive = false
     }
+    implementation("org.jetbrains.kotlin:analysis-api-platform-interface-for-ide:$analysisApiKotlinVersion") {
+        isTransitive = false
+    }
     implementation("org.jetbrains.kotlin:high-level-api-for-ide:$analysisApiKotlinVersion") {
         isTransitive = false
     }
     implementation("org.jetbrains.kotlin:low-level-api-fir-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:analysis-api-providers-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:analysis-project-structure-for-ide:$analysisApiKotlinVersion") {
         isTransitive = false
     }
     implementation("org.jetbrains.kotlin:symbol-light-classes-for-ide:$analysisApiKotlinVersion") {
@@ -46,6 +43,15 @@ dependencies {
         isTransitive = false
     }
     implementation("org.jetbrains.kotlin:high-level-api-impl-base-for-ide:$analysisApiKotlinVersion") {
+        isTransitive = false
+    }
+    implementation("org.jetbrains.kotlin:kotlin-compiler-common-for-ide:$analysisApiKotlinVersion") {
+        isTransitive = false
+    }
+    implementation("org.jetbrains.kotlin:kotlin-compiler-fir-for-ide:$analysisApiKotlinVersion") {
+        isTransitive = false
+    }
+    implementation("org.jetbrains.kotlin:kotlin-compiler-ir-for-ide:$analysisApiKotlinVersion") {
         isTransitive = false
     }
 
