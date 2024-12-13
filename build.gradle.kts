@@ -1,6 +1,6 @@
-val analysisApiKotlinVersion = "2.1.0-dev-5441"
-val intellijVersion = "233.13135.103"
-val jdkVersion = 17
+val analysisApiKotlinVersion = "2.1.20-dev-3305"
+val intellijVersion = "233.13135.128"
+val jdkVersion = 21
 
 plugins {
     kotlin("jvm") version "2.0.20"
@@ -26,38 +26,23 @@ dependencies {
     implementation("com.jetbrains.intellij.platform:util:$intellijVersion")
 
     implementation("org.jetbrains.kotlin:kotlin-compiler:$analysisApiKotlinVersion")
-    implementation("org.jetbrains.kotlin:high-level-api-fir-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:analysis-api-platform-interface-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:high-level-api-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:low-level-api-fir-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:symbol-light-classes-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:analysis-api-standalone-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:high-level-api-impl-base-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:kotlin-compiler-common-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:kotlin-compiler-fir-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
-    }
-    implementation("org.jetbrains.kotlin:kotlin-compiler-ir-for-ide:$analysisApiKotlinVersion") {
-        isTransitive = false
+    implementation("com.github.ben-manes.caffeine:caffeine:2.9.3")  // Needed by kotlin analysis api
+    listOf(
+        "org.jetbrains.kotlin:high-level-api-fir-for-ide",
+        "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide",
+        "org.jetbrains.kotlin:high-level-api-for-ide",
+        "org.jetbrains.kotlin:low-level-api-fir-for-ide",
+        "org.jetbrains.kotlin:symbol-light-classes-for-ide",
+        "org.jetbrains.kotlin:analysis-api-standalone-for-ide",
+        "org.jetbrains.kotlin:high-level-api-impl-base-for-ide",
+        "org.jetbrains.kotlin:kotlin-compiler-common-for-ide",
+        "org.jetbrains.kotlin:kotlin-compiler-fir-for-ide",
+        "org.jetbrains.kotlin:kotlin-compiler-ir-for-ide",
+    ).forEach {
+        implementation("$it:$analysisApiKotlinVersion") { isTransitive = false }
     }
 
-    testImplementation(kotlin("test"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 tasks.test {
