@@ -54,7 +54,7 @@ fun main() {
             val jdkModule = addModule(
                 buildKtSdkModule {
                     platform = JvmPlatforms.defaultJvmPlatform
-                    addBinaryRootsFromJdkHome(Path("/usr/lib/jvm/java-17-openjdk-amd64"), false)
+                    addBinaryRootsFromJdkHome(Path("/usr/lib/jvm/java-21-openjdk"), false)
                     libraryName = "JDK"
                 }
             )
