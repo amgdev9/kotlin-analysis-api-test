@@ -1,6 +1,6 @@
 val analysisApiKotlinVersion = "2.1.20-dev-3305"
 val intellijVersion = "233.13135.128"
-val jdkVersion = 21
+val jdkVersion = 17
 
 plugins {
     kotlin("jvm") version "2.0.20"
