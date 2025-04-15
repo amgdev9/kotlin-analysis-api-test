@@ -1,9 +1,9 @@
-val analysisApiKotlinVersion = "2.1.20-dev-3305"
-val intellijVersion = "233.13135.128"
-val jdkVersion = 17
+val analysisApiKotlinVersion = "2.2.0-dev-7826" // 3-March-2025
+val intellijVersion = "241.19416.19"    // Same as KSP uses, upgrading to latest gives runtime errors (incompatible with Analysis API for now)
+val jdkVersion = 21
 
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.1.0"
 
     application
 }
@@ -28,16 +28,15 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-compiler:$analysisApiKotlinVersion")
     implementation("com.github.ben-manes.caffeine:caffeine:2.9.3")  // Needed by kotlin analysis api
     listOf(
-        "org.jetbrains.kotlin:high-level-api-fir-for-ide",
-        "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide",
-        "org.jetbrains.kotlin:high-level-api-for-ide",
+        "org.jetbrains.kotlin:analysis-api-k2-for-ide",
+        "org.jetbrains.kotlin:analysis-api-for-ide",
         "org.jetbrains.kotlin:low-level-api-fir-for-ide",
+        "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide",
         "org.jetbrains.kotlin:symbol-light-classes-for-ide",
-        "org.jetbrains.kotlin:analysis-api-standalone-for-ide",
-        "org.jetbrains.kotlin:high-level-api-impl-base-for-ide",
+        "org.jetbrains.kotlin:analysis-api-impl-base-for-ide",
         "org.jetbrains.kotlin:kotlin-compiler-common-for-ide",
         "org.jetbrains.kotlin:kotlin-compiler-fir-for-ide",
-        "org.jetbrains.kotlin:kotlin-compiler-ir-for-ide",
+        "org.jetbrains.kotlin:analysis-api-standalone-for-ide",
     ).forEach {
         implementation("$it:$analysisApiKotlinVersion") { isTransitive = false }
     }

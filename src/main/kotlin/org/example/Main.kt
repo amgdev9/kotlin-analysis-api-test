@@ -1,30 +1,13 @@
 package org.example
 
 import com.intellij.core.CoreApplicationEnvironment
-import com.intellij.mock.MockApplication
-import com.intellij.mock.MockProject
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.command.impl.CoreCommandProcessor
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.impl.DocumentWriteAccessGuard
-import com.intellij.openapi.project.Project
-import com.intellij.psi.FileViewProvider
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.impl.DocumentCommitProcessor
-import com.intellij.psi.impl.PsiDocumentManagerBase
-import com.intellij.util.ui.EDT
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.KaDiagnosticCheckerFilter
-import org.jetbrains.kotlin.analysis.api.platform.modification.KaElementModificationType
-import org.jetbrains.kotlin.analysis.api.platform.modification.KaSourceModificationService
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
+import org.jetbrains.kotlin.analysis.api.standalone.base.packages.KotlinStandalonePackageProviderFactory
+import org.jetbrains.kotlin.analysis.api.standalone.base.projectStructure.StandaloneProjectFactory
 import org.jetbrains.kotlin.analysis.api.standalone.buildStandaloneAnalysisAPISession
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtLibraryModule
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtSdkModule
@@ -33,12 +16,6 @@ import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import kotlin.io.path.Path
 import kotlin.system.exitProcess
-
-class WriteAccessGuard: DocumentWriteAccessGuard() {
-    override fun isWritable(p0: Document): Result {
-        return success()
-    }
-}
 
 fun main() {
     var mainSourceModule: KaSourceModule? = null
@@ -78,7 +55,6 @@ fun main() {
         }
     }
 
-    CoreApplicationEnvironment.registerExtensionPoint(session.application.extensionArea, DocumentWriteAccessGuard.EP_NAME, WriteAccessGuard::class.java)
     println("PROJECT SCANNED")
 
     val psiFile = session.modulesWithFiles[mainSourceModule]?.find {
@@ -87,46 +63,6 @@ fun main() {
     val ktFile = (psiFile as? KtFile)!! // PsiJavaFile for java
 
     diagnostics(ktFile)
-
-    // Edit
-    val cmd = session.application.getService(CommandProcessor::class.java)
-    val psiDocMgr = PsiDocumentManager.getInstance(session.project)
-    val doc = psiDocMgr.getDocument(ktFile)!!
-
-    // commitDocument is no-op unless document listeners are setup
-    (psiDocMgr as PsiDocumentManagerBase).disableBackgroundCommit(Disposable {  })  // We need to set this because EDT thread is not set (and can't be set)
-    doc.addDocumentListener(object : DocumentListener {
-        override fun documentChanged(event: DocumentEvent) {
-            super.documentChanged(event)
-
-            psiDocMgr.documentChanged(event)
-        }
-    })
-
-    cmd.executeCommand(session.project, {
-        session.application.runWriteAction {
-            try {
-                doc.replaceString(computeOffset(ktFile.text, 13, 0), computeOffset(ktFile.text, 13, 0), "fun a() {}")
-                println("UNCOMMITED: ${psiDocMgr.uncommittedDocuments.size}")   // This reports 1 after registering listeners
-                psiDocMgr.commitDocument(doc)   // This should commit the document to the ktfile, but it doesnt
-                println("UNCOMMITED: ${psiDocMgr.uncommittedDocuments.size}")
-                //ktFile.onContentReload()    // This sets the changed in Document to the KtFile
-
-                val sms =
-                    KaSourceModificationService.getInstance(session.project)          // This service is implemented by FIR frontend
-                sms.handleElementModification(ktFile, KaElementModificationType.Unknown)    // This invalidates caches
-            } catch (e: Exception) {
-                println(e)  // But an exception is thrown because there is no DocumentCommitProcessor, but we can't register it before it is being requested :) so that means editing the ktfile is not supported
-            }
-        }
-    }, "sample", null)
-
-    session.application.runReadAction {
-        println(ktFile.viewProvider.document.text)
-        println(ktFile.text)
-
-        diagnostics(ktFile)
-    }
 
     //goToDefinition(ktFile, 3, 29)
 
