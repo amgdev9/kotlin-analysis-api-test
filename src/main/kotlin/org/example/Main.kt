@@ -26,7 +26,7 @@ fun main() {
             // Kotlin standard library
             val stdlibModule = addModule(
                 buildKtLibraryModule {
-                    addBinaryRoot(Path("/home/amg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.20/7388d355f7cceb002cd387ccb7ab3850e4e0a07f/kotlin-stdlib-2.0.20.jar"))
+                    addBinaryRoot(Path("/home/amg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.0/85f8b81009cda5890e54ba67d64b5e599c645020/kotlin-stdlib-2.1.0.jar"))
                     platform = JvmPlatforms.defaultJvmPlatform
                     libraryName = "stdlib"
                 }
