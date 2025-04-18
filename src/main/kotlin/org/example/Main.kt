@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.analysis.api.standalone.buildStandaloneAnalysisAPISe
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtLibraryModule
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtSdkModule
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildKtSourceModule
+import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import kotlin.io.path.Path
@@ -19,15 +20,16 @@ import kotlin.system.exitProcess
 
 fun main() {
     var mainSourceModule: KaSourceModule? = null
+    val javaPlatform = JvmPlatforms.jvmPlatformByTargetVersion(JvmTarget.JVM_21)
     val session = buildStandaloneAnalysisAPISession {
         buildKtModuleProvider {
-            platform = JvmPlatforms.defaultJvmPlatform
+            platform = javaPlatform
 
             // Kotlin standard library
             val stdlibModule = addModule(
                 buildKtLibraryModule {
                     addBinaryRoot(Path("/home/amg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.0/85f8b81009cda5890e54ba67d64b5e599c645020/kotlin-stdlib-2.1.0.jar"))
-                    platform = JvmPlatforms.defaultJvmPlatform
+                    platform = javaPlatform
                     libraryName = "stdlib"
                 }
             )
@@ -35,7 +37,7 @@ fun main() {
             // JDK so standard library works for java files
             val jdkModule = addModule(
                 buildKtSdkModule {
-                    platform = JvmPlatforms.defaultJvmPlatform
+                    platform = javaPlatform
                     addBinaryRootsFromJdkHome(Path("/usr/lib/jvm/java-21-openjdk"), false)
                     libraryName = "JDK"
                 }
@@ -43,7 +45,7 @@ fun main() {
 
             mainSourceModule = addModule(buildKtSourceModule {
                 moduleName = "MyModule"
-                platform = JvmPlatforms.defaultJvmPlatform
+                platform = javaPlatform
 
                 addSourceRoots(listOf(
                     Path("testproject")
