@@ -66,7 +66,7 @@ fun main() {
 
     diagnostics(ktFile)
 
-    //goToDefinition(ktFile, 3, 29)
+    goToDefinition(ktFile, 11, 8)
 
     // For some reason analysis api does not exit (a bug has been reported)
     exitProcess(0)

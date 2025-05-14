@@ -1,5 +1,5 @@
-val analysisApiKotlinVersion = "2.2.0-dev-7826" // 3-March-2025
-val intellijVersion = "241.19416.19"    // Same as KSP uses, upgrading to latest gives runtime errors (incompatible with Analysis API for now)
+val analysisApiKotlinVersion = "2.2.20-dev-2432" // 13-May-2025
+val intellijVersion = "241.19416.19"    // Same as KSP uses
 val jdkVersion = 21
 
 plugins {
