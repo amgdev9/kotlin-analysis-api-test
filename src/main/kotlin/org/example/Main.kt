@@ -1,5 +1,6 @@
 package org.example
 
+import org.jetbrains.kotlin.analysis.api.KaIdeApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.KaDiagnosticCheckerFilter
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
@@ -72,12 +73,13 @@ fun computeOffset(text: String, line: Int, column: Int): Int {
     return text.lineSequence().take(line - 1).sumOf { it.length + 1 } + column - 1
 }
 
+@OptIn(KaIdeApi::class)
 fun goToDefinition(ktFile: KtFile, line: Int, column: Int) {
     val offset = computeOffset(ktFile.text, line, column)
     analyze(ktFile) {
         val ref = ktFile.findReferenceAt(offset) as KtReference
         val symbol = ref.resolveToSymbol()!!
-        println("Symbol $symbol")
+        println("Symbol $symbol ${symbol.containingModule} ${symbol.importableFqName}")
         val fileSymbol = symbol.containingFile!!
         println("FileSymbol $fileSymbol")
         val file = fileSymbol.psi as KtFile
